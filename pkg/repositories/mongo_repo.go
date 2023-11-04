@@ -58,9 +58,15 @@ func (m *MongoRepo) GetAllPersons(ctx context.Context) ([]models.Person, error) 
 	return persons, nil
 }
 
-func (m *MongoRepo) GetPersonById(ctx context.Context, oid string) (*models.Person, error) {
+func (m *MongoRepo) GetPersonById(ctx context.Context, id string) (*models.Person, error) {
 	var person models.Person
-	err := m.db.Database("ekms").Collection("people").FindOne(ctx, bson.M{"_id": oid}).Decode(&person)
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Printf("Error while converting id to object id: %v\n", err)
+		return nil, err
+	}
+
+	err = m.db.Database("ekms").Collection("people").FindOne(ctx, bson.M{"_id": oid}).Decode(&person)
 	if err != nil {
 		fmt.Printf("Error while getting person by id: %v\n", err)
 		return nil, err
@@ -121,9 +127,14 @@ func (m *MongoRepo) GetAllServices(ctx context.Context) ([]models.Service, error
 	return services, nil
 }
 
-func (m *MongoRepo) GetServiceById(ctx context.Context, oid string) (*models.Service, error) {
+func (m *MongoRepo) GetServiceById(ctx context.Context, id string) (*models.Service, error) {
 	var service models.Service
-	err := m.db.Database("ekms").Collection("services").FindOne(ctx, bson.M{"_id": oid}).Decode(&service)
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Printf("Error while converting id to object id: %v\n", err)
+		return nil, err
+	}
+	err = m.db.Database("ekms").Collection("services").FindOne(ctx, bson.M{"_id": oid}).Decode(&service)
 	if err != nil {
 		fmt.Printf("Error while getting service by id: %v\n", err)
 		return nil, err
