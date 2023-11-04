@@ -86,18 +86,39 @@ func (m *MongoRepo) CreatePerson(ctx context.Context, person models.Person) (*mo
 	return &person, nil
 }
 
-func (m *MongoRepo) UpdatePerson(ctx context.Context, oid string, person models.Person) (*models.Person, error) {
-	_, err := m.db.Database("ekms").Collection("people").UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": person})
+func (m *MongoRepo) UpdatePerson(ctx context.Context, id string, person models.Person) (*models.Person, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	person.ID = oid
+	if err != nil {
+		fmt.Printf("Error while converting id to object id: %v\n", err)
+		return nil, err
+	}
+	update := bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "name", Value: person.Name},
+			{Key: "birthday", Value: person.Birthday},
+			{Key: "phone", Value: person.Phone},
+			{Key: "address", Value: person.Address},
+			{Key: "fr", Value: person.Fr},
+			{Key: "degree", Value: person.Degree},
+		}},
+	}
+	_, err = m.db.Database("ekms").Collection("people").UpdateOne(ctx, bson.M{"_id": oid}, update)
 	if err != nil {
 		fmt.Printf("Error while updating person: %v\n", err)
 		return nil, err
 	}
-
+	fmt.Println("Person inside update: ", person)
 	return &person, nil
 }
 
-func (m *MongoRepo) DeletePerson(ctx context.Context, oid string) error {
-	_, err := m.db.Database("ekms").Collection("people").DeleteOne(ctx, bson.M{"_id": oid})
+func (m *MongoRepo) DeletePerson(ctx context.Context, id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Printf("Error while converting id to object id: %v\n", err)
+		return err
+	}
+	_, err = m.db.Database("ekms").Collection("people").DeleteOne(ctx, bson.M{"_id": oid})
 	if err != nil {
 		fmt.Printf("Error while deleting person: %v\n", err)
 		return err
@@ -108,7 +129,7 @@ func (m *MongoRepo) DeletePerson(ctx context.Context, oid string) error {
 
 func (m *MongoRepo) GetAllServices(ctx context.Context) ([]models.Service, error) {
 	services := []models.Service{}
-	cur, err := m.db.Database("ekms").Collection("services").Find(ctx, nil)
+	cur, err := m.db.Database("ekms").Collection("services").Find(ctx, bson.D{})
 	if err != nil {
 		fmt.Printf("Error while getting all services: %v\n", err)
 		return nil, err
@@ -154,8 +175,24 @@ func (m *MongoRepo) CreateService(ctx context.Context, service models.Service) (
 	return &service, nil
 }
 
-func (m *MongoRepo) UpdateService(ctx context.Context, oid string, service models.Service) (*models.Service, error) {
-	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": service})
+func (m *MongoRepo) UpdateService(ctx context.Context, id string, service models.Service) (*models.Service, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	service.ID = oid
+	if err != nil {
+		fmt.Printf("Error while converting id to object id: %v\n", err)
+		return nil, err
+	}
+
+	update := bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "date", Value: service.Date},
+			{Key: "subject", Value: service.Subject},
+			{Key: "speaker", Value: service.Speaker},
+			{Key: "bibleChapter", Value: service.BibleChapter},
+		}},
+	}
+
+	_, err = m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": oid}, update)
 	if err != nil {
 		fmt.Printf("Error while updating service: %v\n", err)
 		return nil, err
@@ -164,8 +201,13 @@ func (m *MongoRepo) UpdateService(ctx context.Context, oid string, service model
 	return &service, nil
 }
 
-func (m *MongoRepo) DeleteService(ctx context.Context, oid string) error {
-	_, err := m.db.Database("ekms").Collection("services").DeleteOne(ctx, bson.M{"_id": oid})
+func (m *MongoRepo) DeleteService(ctx context.Context, id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Printf("Error while converting id to object id: %v\n", err)
+		return err
+	}
+	_, err = m.db.Database("ekms").Collection("services").DeleteOne(ctx, bson.M{"_id": oid})
 	if err != nil {
 		fmt.Printf("Error while deleting service: %v\n", err)
 		return err
@@ -175,6 +217,7 @@ func (m *MongoRepo) DeleteService(ctx context.Context, oid string) error {
 }
 
 func (m *MongoRepo) AddAttendanceRecord(ctx context.Context, ar models.AttendanceRecord) (*models.Service, error) {
+	fmt.Println("Attendance record: ", ar)
 	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": ar.ServiceID}, bson.M{"$push": bson.M{"attendanceRecord": ar}})
 	if err != nil {
 		fmt.Printf("Error while adding attendance record: %v\n", err)
