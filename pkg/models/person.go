@@ -12,5 +12,6 @@ type Person struct {
 	Birthday time.Time          `json:"birthday" bson:"birthday,omitempty"`
 	Phone    string             `json:"phone" bson:"phone,omitempty"`
 	Address  string             `json:"address" bson:"address,omitempty"`
-	FOC      string             `json:"foc" bson:"foc,omitempty"`
+	Fr       string             `json:"fr" bson:"fr,omitempty"`
+	Degree   string             `json:"degree" bson:"degree,omitempty"`
 }
