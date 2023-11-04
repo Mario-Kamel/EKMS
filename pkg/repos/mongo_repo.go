@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type RepositoriesInterface interface {
+type RepositoryInterface interface {
 	// Person
 	GetAllPersons(ctx context.Context) ([]models.Person, error)
 	GetPersonById(ctx context.Context, id string) (*models.Person, error)
