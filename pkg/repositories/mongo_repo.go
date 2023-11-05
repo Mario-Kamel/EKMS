@@ -11,19 +11,20 @@ import (
 )
 
 type RepositoryInterface interface {
-	// Person
 	GetAllPersons(ctx context.Context) ([]models.Person, error)
 	GetPersonById(ctx context.Context, id string) (*models.Person, error)
 	CreatePerson(ctx context.Context, person models.Person) (*models.Person, error)
 	UpdatePerson(ctx context.Context, id string, person models.Person) (*models.Person, error)
 	DeletePerson(ctx context.Context, id string) error
-	// Service
+
 	GetAllServices(ctx context.Context) ([]models.Service, error)
 	GetServiceById(ctx context.Context, id string) (*models.Service, error)
 	CreateService(ctx context.Context, service models.Service) (*models.Service, error)
 	UpdateService(ctx context.Context, id string, service models.Service) (*models.Service, error)
 	DeleteService(ctx context.Context, id string) error
-	AddAttendant(ctx context.Context, id string, attendantId string) (*models.Service, error)
+
+	AddAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error)
+	EditAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error)
 }
 
 type MongoRepo struct {
@@ -216,15 +217,15 @@ func (m *MongoRepo) DeleteService(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *MongoRepo) AddAttendanceRecord(ctx context.Context, ar models.AttendanceRecord) (*models.Service, error) {
+func (m *MongoRepo) AddAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error) {
 	fmt.Println("Attendance record: ", ar)
-	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": ar.ServiceID}, bson.M{"$push": bson.M{"attendanceRecord": ar}})
+	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": serviceID}, bson.M{"$push": bson.M{"attendanceRecord": ar}})
 	if err != nil {
 		fmt.Printf("Error while adding attendance record: %v\n", err)
 		return nil, err
 	}
 
-	service, err := m.GetServiceById(ctx, ar.ServiceID.Hex())
+	service, err := m.GetServiceById(ctx, serviceID.Hex())
 	if err != nil {
 		fmt.Printf("Error while getting service by id: %v\n", err)
 		return nil, err
@@ -233,15 +234,15 @@ func (m *MongoRepo) AddAttendanceRecord(ctx context.Context, ar models.Attendanc
 	return service, nil
 }
 
-func (m *MongoRepo) EditAttendanceRecord(ctx context.Context, ar models.AttendanceRecord) (*models.Service, error) {
+func (m *MongoRepo) EditAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error) {
 	//Replace the attendance record in the service having id = ar.ServiceID and having attendanceRecord.personId = ar.PersonID with ar
-	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": ar.ServiceID, "attendanceRecord.personId": ar.PersonID}, bson.M{"$set": bson.M{"attendanceRecord.$": ar}})
+	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": serviceID, "attendanceRecord.personId": ar.PersonID}, bson.M{"$set": bson.M{"attendanceRecord.$": ar}})
 	if err != nil {
 		fmt.Printf("Error while editing attendance record: %v\n", err)
 		return nil, err
 	}
 
-	service, err := m.GetServiceById(ctx, ar.ServiceID.Hex())
+	service, err := m.GetServiceById(ctx, serviceID.Hex())
 	if err != nil {
 		fmt.Printf("Error while getting service by id: %v\n", err)
 		return nil, err
