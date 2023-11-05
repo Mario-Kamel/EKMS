@@ -16,8 +16,7 @@ type Service struct {
 }
 
 type AttendanceRecord struct {
-	ServiceID primitive.ObjectID `json:"serviceId" bson:"serviceId,omitempty"`
-	PersonID  primitive.ObjectID `json:"personId" bson:"personId,omitempty"`
-	Time      time.Time          `json:"time" bson:"time,omitempty"`
-	Status    string             `json:"status" bson:"status,omitempty"`
+	PersonID primitive.ObjectID `json:"personId" bson:"personId,omitempty"`
+	Time     time.Time          `json:"time" bson:"time,omitempty"`
+	Status   string             `json:"status" bson:"status,omitempty"`
 }
