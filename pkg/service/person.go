@@ -8,10 +8,10 @@ import (
 )
 
 type PersonService struct {
-	repo repositories.RepositoryInterface
+	repo repositories.PersonRepoInterface
 }
 
-func NewPersonService(repo repositories.RepositoryInterface) *PersonService {
+func NewPersonService(repo repositories.PersonRepoInterface) *PersonService {
 	return &PersonService{
 		repo: repo,
 	}
