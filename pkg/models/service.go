@@ -13,6 +13,7 @@ type Service struct {
 	Speaker          string             `json:"speaker" bson:"speaker,omitempty"`
 	BibleChapter     string             `json:"bibleChapter" bson:"bibleChapter,omitempty"`
 	AttendanceRecord []AttendanceRecord `json:"attendanceRecord" bson:"attendanceRecord,omitempty"`
+	AssignmentID     primitive.ObjectID `json:"assignmentId" bson:"assignmentId,omitempty"`
 }
 
 type AttendanceRecord struct {

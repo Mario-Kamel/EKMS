@@ -93,6 +93,7 @@ func (m *ServiceRepo) UpdateService(ctx context.Context, id string, service mode
 			{Key: "subject", Value: service.Subject},
 			{Key: "speaker", Value: service.Speaker},
 			{Key: "bibleChapter", Value: service.BibleChapter},
+			{Key: "assignmentId", Value: service.AssignmentID},
 		}},
 	}
 
