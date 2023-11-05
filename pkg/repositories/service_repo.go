@@ -19,6 +19,7 @@ type ServiceRepoInterface interface {
 
 	AddAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error)
 	EditAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error)
+	DeleteAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error)
 }
 
 type ServiceRepo struct {
@@ -154,4 +155,21 @@ func (m *ServiceRepo) EditAttendanceRecord(ctx context.Context, serviceID primit
 
 	return service, nil
 
+}
+
+func (m *ServiceRepo) DeleteAttendanceRecord(ctx context.Context, serviceID primitive.ObjectID, ar models.AttendanceRecord) (*models.Service, error) {
+	//Delete the attendance record in the service having id = ar.ServiceID and having attendanceRecord.personId = ar.PersonID
+	_, err := m.db.Database("ekms").Collection("services").UpdateOne(ctx, bson.M{"_id": serviceID}, bson.M{"$pull": bson.M{"attendanceRecord": bson.M{"personId": ar.PersonID}}})
+	if err != nil {
+		fmt.Printf("Error while deleting attendance record: %v\n", err)
+		return nil, err
+	}
+
+	service, err := m.GetServiceById(ctx, serviceID.Hex())
+	if err != nil {
+		fmt.Printf("Error while getting service by id: %v\n", err)
+		return nil, err
+	}
+
+	return service, nil
 }
