@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	cerrors "github.com/Mario-Kamel/EKMS/pkg/errors"
+	"github.com/Mario-Kamel/EKMS/pkg/cerrors"
 	"github.com/Mario-Kamel/EKMS/pkg/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
