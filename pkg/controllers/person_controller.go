@@ -7,24 +7,24 @@ import (
 	"fmt"
 	"net/http"
 
-	cerrors "github.com/Mario-Kamel/EKMS/pkg/errors"
+	"github.com/Mario-Kamel/EKMS/pkg/cerrors"
 	"github.com/Mario-Kamel/EKMS/pkg/models"
 	"github.com/Mario-Kamel/EKMS/pkg/service"
 	"github.com/gorilla/mux"
 )
 
 type PersonController struct {
-	service *service.PersonService
+	svc *service.PersonService
 }
 
-func NewPersonController(service *service.PersonService) *PersonController {
+func NewPersonController(svc *service.PersonService) *PersonController {
 	return &PersonController{
-		service: service,
+		svc: svc,
 	}
 }
 
 func (c *PersonController) GetAllPersons(w http.ResponseWriter, r *http.Request) {
-	persons, err := c.service.GetAllPersons(context.Background())
+	persons, err := c.svc.GetAllPersons(context.Background())
 	if err != nil {
 		fmt.Printf("Error while getting all persons: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -36,7 +36,7 @@ func (c *PersonController) GetAllPersons(w http.ResponseWriter, r *http.Request)
 
 func (c *PersonController) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	person, err := c.service.GetPersonById(context.Background(), id)
+	person, err := c.svc.GetPersonById(context.Background(), id)
 	if err != nil {
 		var IDErr *cerrors.InvalidIDError
 		if errors.As(err, &IDErr) {
@@ -58,7 +58,7 @@ func (c *PersonController) CreatePerson(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	p, err := c.service.CreatePerson(context.Background(), person)
+	p, err := c.svc.CreatePerson(context.Background(), person)
 	if err != nil {
 		fmt.Printf("Error while creating person: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -78,7 +78,7 @@ func (c *PersonController) UpdatePerson(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	p, err := c.service.UpdatePerson(context.Background(), id, person)
+	p, err := c.svc.UpdatePerson(context.Background(), id, person)
 	if err != nil {
 		fmt.Printf("Error while updating person: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -90,7 +90,7 @@ func (c *PersonController) UpdatePerson(w http.ResponseWriter, r *http.Request) 
 
 func (c *PersonController) DeletePerson(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	err := c.service.DeletePerson(context.Background(), id)
+	err := c.svc.DeletePerson(context.Background(), id)
 	if err != nil {
 		fmt.Printf("Error while deleting person: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
