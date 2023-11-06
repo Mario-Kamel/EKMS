@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	cerrors "github.com/Mario-Kamel/EKMS/pkg/errors"
 	"github.com/Mario-Kamel/EKMS/pkg/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -53,8 +54,9 @@ func (m *PersonRepo) GetPersonById(ctx context.Context, id string) (*models.Pers
 	var person models.Person
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		fmt.Printf("Error while converting id to object id: %v\n", err)
-		return nil, err
+		fmt.Printf("Error while converting id to object id %v: %v\n", id, err)
+		custErr := cerrors.NewInvalidIDError("GetPersonById", "PersonRepo", err)
+		return nil, custErr
 	}
 
 	err = m.db.Database("ekms").Collection("people").FindOne(ctx, bson.M{"_id": oid}).Decode(&person)
@@ -81,8 +83,9 @@ func (m *PersonRepo) UpdatePerson(ctx context.Context, id string, person models.
 	oid, err := primitive.ObjectIDFromHex(id)
 	person.ID = oid
 	if err != nil {
-		fmt.Printf("Error while converting id to object id: %v\n", err)
-		return nil, err
+		fmt.Printf("Error while converting id to object id %v: %v\n", id, err)
+		custErr := cerrors.NewInvalidIDError("UpdatePerson", "PersonRepo", err)
+		return nil, custErr
 	}
 	update := bson.D{
 		{Key: "$set", Value: bson.D{
@@ -106,8 +109,9 @@ func (m *PersonRepo) UpdatePerson(ctx context.Context, id string, person models.
 func (m *PersonRepo) DeletePerson(ctx context.Context, id string) error {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		fmt.Printf("Error while converting id to object id: %v\n", err)
-		return err
+		fmt.Printf("Error while converting id to object id %v: %v\n", id, err)
+		custErr := cerrors.NewInvalidIDError("DeletePerson", "PersonRepo", err)
+		return custErr
 	}
 	_, err = m.db.Database("ekms").Collection("people").DeleteOne(ctx, bson.M{"_id": oid})
 	if err != nil {
