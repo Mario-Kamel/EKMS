@@ -15,6 +15,6 @@ type Assignment struct {
 }
 
 type AssignmentSubmission struct {
-	ID   primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Time time.Time          `json:"time" bson:"time,omitempty"`
+	PersonID primitive.ObjectID `json:"personId" bson:"personId,omitempty"`
+	Time     time.Time          `json:"time" bson:"time,omitempty"`
 }
