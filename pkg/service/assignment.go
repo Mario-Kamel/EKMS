@@ -2,11 +2,9 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Mario-Kamel/EKMS/pkg/models"
 	"github.com/Mario-Kamel/EKMS/pkg/repositories"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AssignmentService struct {
@@ -57,22 +55,4 @@ func (s *AssignmentService) DeleteAssignment(ctx context.Context, id string) err
 		return err
 	}
 	return nil
-}
-
-func (s *AssignmentService) AddSubmission(ctx context.Context, assignmentID string, submittedID string) (*models.Assignment, error) {
-	assignmentOID, err := primitive.ObjectIDFromHex(assignmentID)
-	if err != nil {
-		fmt.Println("Error while converting assignment id to object id")
-		return nil, err
-	}
-	submittedOID, err := primitive.ObjectIDFromHex(submittedID)
-	if err != nil {
-		fmt.Println("Error while converting submitted id to object id")
-		return nil, err
-	}
-	a, err := s.repo.AddSubmission(ctx, assignmentOID, submittedOID)
-	if err != nil {
-		return nil, err
-	}
-	return a, nil
 }

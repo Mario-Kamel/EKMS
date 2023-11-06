@@ -16,7 +16,6 @@ type AssignmentRepoInterface interface {
 	CreateAssignment(ctx context.Context, assignment models.Assignment) (*models.Assignment, error)
 	UpdateAssignment(ctx context.Context, id string, assignment models.Assignment) (*models.Assignment, error)
 	DeleteAssignment(ctx context.Context, id string) error
-	AddSubmission(ctx context.Context, assignmentID primitive.ObjectID, submittedID primitive.ObjectID) (*models.Assignment, error)
 }
 
 type AssignmentRepo struct {
@@ -109,22 +108,4 @@ func (m *AssignmentRepo) DeleteAssignment(ctx context.Context, id string) error 
 	}
 
 	return nil
-}
-
-// Add submission function
-func (m *AssignmentRepo) AddSubmission(ctx context.Context, assignmentID primitive.ObjectID, submittedID primitive.ObjectID) (*models.Assignment, error) {
-	var assignment models.Assignment
-	_, err := m.db.Database("ekms").Collection("assignments").UpdateOne(ctx, bson.M{"_id": assignmentID}, bson.M{"$push": bson.M{"submittedIds": submittedID}})
-	if err != nil {
-		fmt.Printf("Error while updating assignment: %v\n", err)
-		return nil, err
-	}
-
-	err = m.db.Database("ekms").Collection("assignments").FindOne(ctx, bson.M{"_id": assignmentID}).Decode(&assignment)
-	if err != nil {
-		fmt.Printf("Error while getting assignment by id: %v\n", err)
-		return nil, err
-	}
-
-	return &assignment, nil
 }
