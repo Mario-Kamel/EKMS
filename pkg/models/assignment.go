@@ -7,9 +7,14 @@ import (
 )
 
 type Assignment struct {
-	ID           primitive.ObjectID   `json:"id" bson:"_id,omitempty"`
-	ServiceID    primitive.ObjectID   `json:"serviceId" bson:"serviceId,omitempty"`
-	Title        string               `json:"title" bson:"title,omitempty"`
-	Deadline     time.Time            `json:"deadline" bson:"deadline,omitempty"`
-	SubmittedIDs []primitive.ObjectID `json:"submittedIds" bson:"submittedIds,omitempty"`
+	ID          primitive.ObjectID     `json:"id" bson:"_id,omitempty"`
+	ServiceID   primitive.ObjectID     `json:"serviceId" bson:"serviceId,omitempty"`
+	Title       string                 `json:"title" bson:"title,omitempty"`
+	Deadline    time.Time              `json:"deadline" bson:"deadline,omitempty"`
+	Submissions []AssignmentSubmission `json:"submissions" bson:"submissions,omitempty"`
+}
+
+type AssignmentSubmission struct {
+	ID   primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Time time.Time          `json:"time" bson:"time,omitempty"`
 }
